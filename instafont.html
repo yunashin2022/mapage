@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta property="og:title" content="Noel's Instafont" />
+        <meta property="og:description" content="인스타 감성 폰트 & 이모티콘 복사 도구" />
+        <title>Noel _ Instafont</title>
+        <style>
+            @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+            * {
+                box-sizing: border-box;
+                font-family: "Pretendard", serif;
+            }
+            body {
+                background-color: #f3ceee;
+                margin: 0;
+                padding: 20px 12px 60px 12px;
+            }
+            .top {
+                max-width: 480px;
+                margin: 0 auto 20px auto;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .top a {
+                color: white;
+                font-size: 14px;
+                text-decoration: none;
+                font-weight: bold;
+                background-color: rgba(255,255,255,0.35);
+                padding: 6px 12px;
+                border-radius: 8px;
+            }
+            h1 {
+                color: white;
+                font-size: 20px;
+                text-align: center;
+                margin: 0 auto 20px auto;
+                max-width: 480px;
+            }
+            .card {
+                max-width: 480px;
+                margin: 0 auto 16px auto;
+                background: white;
+                border-radius: 12px;
+                padding: 14px;
+                box-shadow: 3px 3px 8px 0px rgba(0,0,0,0.25);
+            }
+            .tabs {
+                max-width: 480px;
+                margin: 0 auto 14px auto;
+                display: flex;
+                gap: 8px;
+            }
+            .tabs button {
+                flex: 1;
+                padding: 10px;
+                border: none;
+                border-radius: 8px;
+                background: rgba(255,255,255,0.55);
+                color: #7a3d78;
+                font-weight: bold;
+                font-size: 14px;
+                cursor: pointer;
+            }
+            .tabs button.active {
+                background: white;
+                color: #d24fc9;
+            }
+            input#textInput {
+                width: 100%;
+                padding: 12px;
+                border-radius: 8px;
+                border: 1px solid #eeddee;
+                font-size: 15px;
+                outline: none;
+            }
+            input#textInput:focus {
+                border-color: #e79ee0;
+            }
+            .result-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                gap: 10px;
+                padding: 10px 4px;
+                border-bottom: 1px solid #f4eef4;
+            }
+            .result-row:last-child {
+                border-bottom: none;
+            }
+            .result-text {
+                font-size: 16px;
+                word-break: break-all;
+                color: #333;
+            }
+            .style-name {
+                font-size: 11px;
+                color: #b98cb5;
+                margin-bottom: 2px;
+            }
+            .copy-btn {
+                flex-shrink: 0;
+                border: none;
+                background-color: #f5c6fa;
+                color: white;
+                font-weight: bold;
+                font-size: 12px;
+                padding: 8px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+            }
+            .copy-btn:hover {
+                background-color: #e79ee0;
+            }
+            .empty-hint {
+                text-align: center;
+                color: #bbb;
+                font-size: 13px;
+                padding: 20px 0;
+            }
+            .kaomoji-cat {
+                font-size: 13px;
+                font-weight: bold;
+                color: #b98cb5;
+                margin: 12px 0 8px 0;
+            }
+            .kaomoji-cat:first-child {
+                margin-top: 0;
+            }
+            .kaomoji-grid {
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+            .kaomoji-item {
+                border: none;
+                background-color: #faf3fb;
+                color: #333;
+                font-size: 14px;
+                padding: 10px 6px;
+                border-radius: 8px;
+                cursor: pointer;
+                word-break: break-all;
+            }
+            .kaomoji-item:hover {
+                background-color: #f5e3f7;
+            }
+            #toast {
+                position: fixed;
+                left: 50%;
+                bottom: 30px;
+                transform: translateX(-50%) translateY(20px);
+                background: rgba(0,0,0,0.75);
+                color: white;
+                padding: 10px 18px;
+                border-radius: 20px;
+                font-size: 13px;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.2s ease, transform 0.2s ease;
+            }
+            #toast.show {
+                opacity: 1;
+                transform: translateX(-50%) translateY(0);
+            }
+            section { display: none; }
+            section.active { display: block; }
+        </style>
+    </head>
+    <body>
+        <div class="top">
+            <a href="index.html">← 홈으로</a>
+            <span></span>
+        </div>
+        <h1>인스타 폰트 &amp; 이모티콘</h1>
+
+        <div class="card">
+            <input id="textInput" type="text" placeholder="여기에 텍스트를 입력하세요" />
+        </div>
+
+        <div class="tabs">
+            <button id="tabFontBtn" class="active">폰트</button>
+            <button id="tabKaomojiBtn">이모티콘</button>
+        </div>
+
+        <section id="fontSection" class="active">
+            <div class="card" id="fontResults">
+                <div class="empty-hint">텍스트를 입력하면 다양한 스타일이 나타나요</div>
+            </div>
+        </section>
+
+        <section id="kaomojiSection">
+            <div class="card" id="kaomojiResults"></div>
+        </section>
+
+        <div id="toast"></div>
+
+        <script>
+            // ---- 유니코드 폰트 변환 (Mathematical Alphanumeric Symbols 등 공개 표준 매핑) ----
+            const FONT_STYLES = [
+                { name: "Bold",                upper: 0x1D400, lower: 0x1D41A, digit: 0x1D7CE },
+                { name: "Italic",               upper: 0x1D434, lower: 0x1D44E, exceptions: { h: "ℎ" } },
+                { name: "Bold Italic",          upper: 0x1D468, lower: 0x1D482 },
+                { name: "Script Bold",          upper: 0x1D4D0, lower: 0x1D4EA },
+                { name: "Fraktur Bold",         upper: 0x1D56C, lower: 0x1D586 },
+                {
+                    name: "Double-Struck", upper: 0x1D538, lower: 0x1D552, digit: 0x1D7D8,
+                    exceptions: { C: "ℂ", H: "ℍ", N: "ℕ", P: "ℙ", Q: "ℚ", R: "ℝ", Z: "ℤ" }
+                },
+                { name: "Sans-Serif",           upper: 0x1D5A0, lower: 0x1D5BA, digit: 0x1D7E2 },
+                { name: "Sans-Serif Bold",      upper: 0x1D5D4, lower: 0x1D5EE, digit: 0x1D7EC },
+                { name: "Sans-Serif Italic",    upper: 0x1D608, lower: 0x1D622 },
+                { name: "Sans-Serif Bold Italic", upper: 0x1D63C, lower: 0x1D656 },
+                { name: "Monospace",            upper: 0x1D670, lower: 0x1D68A, digit: 0x1D7F6 },
+                { name: "Fullwidth",            upper: 0xFF21,  lower: 0xFF41,  digit: 0xFF10 },
+                {
+                    name: "Circled",
+                    custom: (ch) => {
+                        if (/[A-Z]/.test(ch)) return String.fromCodePoint(0x24B6 + (ch.charCodeAt(0) - 65));
+                        if (/[a-z]/.test(ch)) return String.fromCodePoint(0x24D0 + (ch.charCodeAt(0) - 97));
+                        if (ch === "0") return "⓪";
+                        if (/[1-9]/.test(ch)) return String.fromCodePoint(0x2460 + (ch.charCodeAt(0) - 49));
+                        return ch;
+                    }
+                },
+                {
+                    name: "Small Caps",
+                    custom: (ch) => {
+                        const map = {
+                            a: "ᴀ", b: "ʙ", c: "ᴄ", d: "ᴅ", e: "ᴇ", f: "ꜰ", g: "ɢ", h: "ʜ",
+                            i: "ɪ", j: "ᴊ", k: "ᴋ", l: "ʟ", m: "ᴍ", n: "ɴ", o: "ᴏ", p: "ᴘ",
+                            q: "ǫ", r: "ʀ", s: "s", t: "ᴛ", u: "ᴜ", v: "ᴠ", w: "ᴡ", x: "x",
+                            y: "ʏ", z: "ᴢ"
+                        };
+                        const lower = ch.toLowerCase();
+                        return map[lower] !== undefined ? map[lower] : ch;
+                    }
+                },
+                {
+                    name: "Upside Down",
+                    isFlip: true,
+                    custom: (ch) => {
+                        const map = {
+                            a: "ɐ", b: "q", c: "ɔ", d: "p", e: "ǝ", f: "ɟ", g: "ƃ", h: "ɥ",
+                            i: "ᴉ", j: "ɾ", k: "ʞ", l: "l", m: "ɯ", n: "u", o: "o", p: "d",
+                            q: "b", r: "ɹ", s: "s", t: "ʇ", u: "n", v: "ʌ", w: "ʍ", x: "x",
+                            y: "ʎ", z: "z",
+                            "0": "0", "1": "Ɩ", "2": "ᄅ", "3": "Ɛ", "4": "ㄣ", "5": "5",
+                            "6": "9", "7": "ㄥ", "8": "8", "9": "6",
+                            ".": "˙", ",": "'", "?": "¿", "!": "¡", "'": ",",
+                            "(": ")", ")": "(", "[": "]", "]": "[", "{": "}", "}": "{",
+                            "<": ">", ">": "<", "&": "⅋"
+                        };
+                        const lower = ch.toLowerCase();
+                        return map[lower] !== undefined ? map[lower] : ch;
+                    }
+                }
+            ];
+
+            function convert(text, style) {
+                const chars = Array.from(text).map((ch) => {
+                    if (style.exceptions && style.exceptions[ch] !== undefined) return style.exceptions[ch];
+                    if (style.custom) return style.custom(ch);
+                    if (/[A-Z]/.test(ch) && style.upper !== undefined) {
+                        return String.fromCodePoint(style.upper + (ch.charCodeAt(0) - 65));
+                    }
+                    if (/[a-z]/.test(ch) && style.lower !== undefined) {
+                        return String.fromCodePoint(style.lower + (ch.charCodeAt(0) - 97));
+                    }
+                    if (/[0-9]/.test(ch) && style.digit !== undefined) {
+                        return String.fromCodePoint(style.digit + (ch.charCodeAt(0) - 48));
+                    }
+                    return ch;
+                });
+                if (style.isFlip) chars.reverse();
+                return chars.join("");
+            }
+
+            const fontResults = document.getElementById("fontResults");
+            const textInput = document.getElementById("textInput");
+
+            function renderFonts() {
+                const text = textInput.value;
+                if (!text.trim()) {
+                    fontResults.innerHTML = '<div class="empty-hint">텍스트를 입력하면 다양한 스타일이 나타나요</div>';
+                    return;
+                }
+                fontResults.innerHTML = "";
+                FONT_STYLES.forEach((style) => {
+                    const converted = convert(text, style);
+                    const row = document.createElement("div");
+                    row.className = "result-row";
+                    row.innerHTML =
+                        '<div><div class="style-name">' + style.name + '</div>' +
+                        '<div class="result-text"></div></div>' +
+                        '<button class="copy-btn">복사</button>';
+                    row.querySelector(".result-text").textContent = converted;
+                    row.querySelector(".copy-btn").addEventListener("click", () => copyText(converted));
+                    fontResults.appendChild(row);
+                });
+            }
+
+            textInput.addEventListener("input", renderFonts);
+
+            // ---- 이모티콘 (카오모지) ----
+            const KAOMOJI = {
+                "기쁨": ["(◕‿◕)", "(^▽^)", "(≧◡≦)", "ヽ(°〇°)ノ", "(´▽`)", "(*^▽^*)", "٩(◕‿◕)۶", "(o^▽^o)"],
+                "슬픔": ["(╥﹏╥)", "(T_T)", "(；一_一)", "(´；ω；`)", "( ; ω ; )", "(っ˘̩╭╮˘̩)っ"],
+                "사랑": ["(♥ω♥)", "(｡♥‿♥｡)", "ღ(´◡`ღ)", "(｡•ᴗ•｡)", "(◍•ᴗ•◍)❤", "(´ω｀*)♡"],
+                "화남": ["(╬ಠ益ಠ)", "ヽ(｀Д´)ﾉ", "(≧Д≦)", "(｀皿´)", "٩(๑`^´๑)۶"],
+                "놀람": ["(⊙_⊙)", "(°o°)", "Σ(°△°|||)", "(￣□￣;)"],
+                "당황/포기": ["¯\\_(ツ)_/¯", "(╯°□°)╯︵ ┻━┻", "┬─┬ノ(º_ºノ)", "(・・? )", "(￣ω￣;)"],
+                "귀여움": ["(=^･ω･^=)", "ʕ•ᴥ•ʔ", "(◉ᴥ◉)", "(｡•ᴥ•｡)", "(o･ω･o)ﾉ"],
+                "응원/파이팅": ["(ง •̀_•́)ง", "ᕦ(ò_óˇ)ᕤ", "ヾ(＾∇＾)", "(＾▽＾)"]
+            };
+
+            const kaomojiResults = document.getElementById("kaomojiResults");
+            Object.keys(KAOMOJI).forEach((cat) => {
+                const label = document.createElement("div");
+                label.className = "kaomoji-cat";
+                label.textContent = cat;
+                kaomojiResults.appendChild(label);
+
+                const grid = document.createElement("div");
+                grid.className = "kaomoji-grid";
+                KAOMOJI[cat].forEach((face) => {
+                    const btn = document.createElement("button");
+                    btn.className = "kaomoji-item";
+                    btn.textContent = face;
+                    btn.addEventListener("click", () => copyText(face));
+                    grid.appendChild(btn);
+                });
+                kaomojiResults.appendChild(grid);
+            });
+
+            // ---- 탭 전환 ----
+            const tabFontBtn = document.getElementById("tabFontBtn");
+            const tabKaomojiBtn = document.getElementById("tabKaomojiBtn");
+            const fontSection = document.getElementById("fontSection");
+            const kaomojiSection = document.getElementById("kaomojiSection");
+
+            tabFontBtn.addEventListener("click", () => {
+                tabFontBtn.classList.add("active");
+                tabKaomojiBtn.classList.remove("active");
+                fontSection.classList.add("active");
+                kaomojiSection.classList.remove("active");
+            });
+            tabKaomojiBtn.addEventListener("click", () => {
+                tabKaomojiBtn.classList.add("active");
+                tabFontBtn.classList.remove("active");
+                kaomojiSection.classList.add("active");
+                fontSection.classList.remove("active");
+            });
+
+            // ---- 복사 ----
+            let toastTimer = null;
+            function copyText(text) {
+                const showToast = () => {
+                    const toast = document.getElementById("toast");
+                    toast.textContent = "복사되었습니다!";
+                    toast.classList.add("show");
+                    clearTimeout(toastTimer);
+                    toastTimer = setTimeout(() => toast.classList.remove("show"), 1200);
+                };
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text, showToast));
+                } else {
+                    fallbackCopy(text, showToast);
+                }
+            }
+            function fallbackCopy(text, cb) {
+                const ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand("copy"); } catch (e) {}
+                document.body.removeChild(ta);
+                cb();
+            }
+        </script>
+    </body>
+</html>
