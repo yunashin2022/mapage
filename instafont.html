@@ -133,7 +133,7 @@
             }
             .kaomoji-grid {
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(auto-fill, minmax(64px, 1fr));
                 gap: 8px;
             }
             .kaomoji-item {
@@ -185,6 +185,7 @@
         <div class="tabs">
             <button id="tabFontBtn" class="active">폰트</button>
             <button id="tabKaomojiBtn">이모티콘</button>
+            <button id="tabSymbolBtn">꾸밈 기호</button>
         </div>
 
         <section id="fontSection" class="active">
@@ -195,6 +196,10 @@
 
         <section id="kaomojiSection">
             <div class="card" id="kaomojiResults"></div>
+        </section>
+
+        <section id="symbolSection">
+            <div class="card" id="symbolResults"></div>
         </section>
 
         <div id="toast"></div>
@@ -318,43 +323,62 @@
                 "응원/파이팅": ["(ง •̀_•́)ง", "ᕦ(ò_óˇ)ᕤ", "ヾ(＾∇＾)", "(＾▽＾)"]
             };
 
-            const kaomojiResults = document.getElementById("kaomojiResults");
-            Object.keys(KAOMOJI).forEach((cat) => {
-                const label = document.createElement("div");
-                label.className = "kaomoji-cat";
-                label.textContent = cat;
-                kaomojiResults.appendChild(label);
+            // ---- 꾸밈 기호 (별, 꽃, 날씨, 하트, 구분선 등 표준 유니코드 기호) ----
+            const SYMBOLS = {
+                "별/반짝임": ["★", "☆", "✦", "✧", "✩", "✫", "✬", "✭", "✮", "✯", "⋆", "✶"],
+                "꽃/자연": ["❀", "❁", "✿", "❃", "❋", "⚘", "☘"],
+                "날씨/하늘": ["☀", "☁", "☂", "☃", "❄", "❅", "❆", "☽", "☾", "☄"],
+                "하트": ["♡", "♥", "❤", "❣", "❥", "ღ"],
+                "구분선/장식": ["⋆⋅☆⋅⋆", "✧˖°", "◜◝◟◞", "▬▭▬▭▬", "┈┈┈┈┈┈┈┈", "⊹₊⋆", "•₊¸.。☆"],
+                "미니 페이스": ["⋈", "ᵔᴥᵔ", "˙◠˙", "°▽°", "•ω•", "⌒▽⌒"]
+            };
 
-                const grid = document.createElement("div");
-                grid.className = "kaomoji-grid";
-                KAOMOJI[cat].forEach((face) => {
-                    const btn = document.createElement("button");
-                    btn.className = "kaomoji-item";
-                    btn.textContent = face;
-                    btn.addEventListener("click", () => copyText(face));
-                    grid.appendChild(btn);
+            function renderCategoryGrid(containerId, data) {
+                const container = document.getElementById(containerId);
+                Object.keys(data).forEach((cat) => {
+                    const label = document.createElement("div");
+                    label.className = "kaomoji-cat";
+                    label.textContent = cat;
+                    container.appendChild(label);
+
+                    const grid = document.createElement("div");
+                    grid.className = "kaomoji-grid";
+                    data[cat].forEach((item) => {
+                        const btn = document.createElement("button");
+                        btn.className = "kaomoji-item";
+                        btn.textContent = item;
+                        btn.addEventListener("click", () => copyText(item));
+                        grid.appendChild(btn);
+                    });
+                    container.appendChild(grid);
                 });
-                kaomojiResults.appendChild(grid);
-            });
+            }
+
+            renderCategoryGrid("kaomojiResults", KAOMOJI);
+            renderCategoryGrid("symbolResults", SYMBOLS);
 
             // ---- 탭 전환 ----
-            const tabFontBtn = document.getElementById("tabFontBtn");
-            const tabKaomojiBtn = document.getElementById("tabKaomojiBtn");
-            const fontSection = document.getElementById("fontSection");
-            const kaomojiSection = document.getElementById("kaomojiSection");
+            const tabButtons = {
+                font: document.getElementById("tabFontBtn"),
+                kaomoji: document.getElementById("tabKaomojiBtn"),
+                symbol: document.getElementById("tabSymbolBtn")
+            };
+            const sections = {
+                font: document.getElementById("fontSection"),
+                kaomoji: document.getElementById("kaomojiSection"),
+                symbol: document.getElementById("symbolSection")
+            };
 
-            tabFontBtn.addEventListener("click", () => {
-                tabFontBtn.classList.add("active");
-                tabKaomojiBtn.classList.remove("active");
-                fontSection.classList.add("active");
-                kaomojiSection.classList.remove("active");
-            });
-            tabKaomojiBtn.addEventListener("click", () => {
-                tabKaomojiBtn.classList.add("active");
-                tabFontBtn.classList.remove("active");
-                kaomojiSection.classList.add("active");
-                fontSection.classList.remove("active");
-            });
+            function showTab(key) {
+                Object.keys(tabButtons).forEach((k) => {
+                    tabButtons[k].classList.toggle("active", k === key);
+                    sections[k].classList.toggle("active", k === key);
+                });
+            }
+
+            tabButtons.font.addEventListener("click", () => showTab("font"));
+            tabButtons.kaomoji.addEventListener("click", () => showTab("kaomoji"));
+            tabButtons.symbol.addEventListener("click", () => showTab("symbol"));
 
             // ---- 복사 ----
             let toastTimer = null;
